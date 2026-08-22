@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — arts by zahra</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700&family=Jost:wght@300;400;500;600&family=Mrs+Saint+Delafield&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1a1613;
+    --parchment:#f2e8d6;
+    --parchment-deep:#e6d4ac;
+    --emerald:#0d4a3f;
+    --emerald-deep:#093530;
+    --gold:#b8863a;
+    --gold-light:#d9b06a;
+    --rose:#6b1f2a;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--parchment); color:var(--ink); font-family:'Jost', sans-serif;
+    font-weight:300; line-height:1.6; min-height:100vh;
+  }
+  h1,h2,h3{font-family:'Amiri', serif; font-weight:700;}
+  .logo{font-family:'Mrs Saint Delafield', cursive; font-size:1.8rem; color:var(--emerald-deep);}
+  header{
+    background:rgba(242,232,214,0.95); border-bottom:1px solid rgba(26,22,19,0.1);
+    padding:16px 28px; display:flex; align-items:center; justify-content:space-between;
+  }
+  .wrap{max-width:980px; margin:0 auto; padding:40px 24px;}
+
+  .login-box{
+    max-width:380px; margin:80px auto; background:var(--parchment-deep);
+    padding:40px 32px; border-radius:4px; border:1px solid rgba(26,22,19,0.12);
+  }
+  .login-box h2{margin-bottom:24px; text-align:center;}
+  .field{display:flex; flex-direction:column; gap:6px; margin-bottom:16px;}
+  .field label{font-size:0.8rem; text-transform:uppercase; letter-spacing:0.03em;}
+  .field-hint{font-size:0.76rem; color:#6a6156; margin-top:-2px;}
+  .field input, .field select, .field textarea{
+    padding:12px 14px; border:1px solid rgba(26,22,19,0.3); background:var(--parchment);
+    font-family:'Jost',sans-serif; font-size:0.95rem; color:var(--ink); border-radius:2px;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus{outline:none; border-color:var(--emerald);}
+  .checkbox-field{display:flex; align-items:center; gap:10px; margin-bottom:16px;}
+  .checkbox-field input{width:18px; height:18px;}
+  .checkbox-field label{font-size:0.9rem; text-transform:none; letter-spacing:normal;}
+  .btn{
+    display:inline-block; padding:13px 26px; font-size:0.95rem; letter-spacing:0.02em;
+    border-radius:2px; cursor:pointer; border:none; font-family:'Jost',sans-serif;
+    background:var(--emerald); color:#fbf3e0; transition:background 0.2s ease;
+  }
+  .btn:hover{background:var(--emerald-deep);}
+  .btn:disabled{opacity:0.6; cursor:not-allowed;}
+  .btn-danger{background:var(--rose);}
+  .btn-danger:hover{background:#521621;}
+  .btn-star{background:var(--gold);}
+  .btn-star:hover{background:#96702e;}
+  .btn-small{padding:8px 14px; font-size:0.8rem;}
+  .btn-logout{background:transparent; border:1px solid var(--ink); color:var(--ink); padding:8px 18px; font-size:0.85rem;}
+  .btn-logout:hover{background:var(--ink); color:var(--parchment);}
+  .msg{margin-top:14px; font-size:0.88rem; padding:10px 14px; border-radius:2px; display:none;}
+  .msg.show{display:block;}
+  .msg.error{background:var(--rose); color:#fff;}
+  .msg.success{background:var(--emerald); color:#fff;}
+
+  #dashboard{display:none;}
+  .panel{
+    background:var(--parchment-deep); border:1px solid rgba(26,22,19,0.12);
+    border-radius:4px; padding:28px; margin-bottom:36px;
+  }
+  .panel h2{margin-bottom:20px; font-size:1.4rem;}
+  .row-2{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+  .items-list{display:flex; flex-direction:column; gap:14px;}
+  .item-row{
+    display:flex; gap:16px; align-items:center; background:var(--parchment);
+    border:1px solid rgba(26,22,19,0.12); border-radius:4px; padding:12px 16px; flex-wrap:wrap;
+  }
+  .item-row img{width:64px; height:64px; object-fit:cover; border-radius:3px; flex-shrink:0;}
+  .item-row .item-info{flex:1; min-width:180px;}
+  .item-row .item-info h4{font-family:'Jost',sans-serif; font-weight:500; font-size:1rem; display:flex; align-items:center; gap:8px;}
+  .item-row .item-info span{font-size:0.8rem; color:#5a5148; margin-right:10px;}
+  .featured-star{color:var(--gold); font-size:0.9rem;}
+  .item-actions{display:flex; gap:8px;}
+  .empty{color:#6a6156; font-size:0.9rem; text-align:center; padding:20px;}
+  .upload-status{font-size:0.85rem; color:var(--emerald-deep); margin-top:6px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">arts by zahra — admin</div>
+  <button class="btn-logout" id="logoutBtn" style="display:none;">Log out</button>
+</header>
+
+<div class="wrap">
+
+  <div class="login-box" id="loginBox">
+    <h2>Admin Login</h2>
+    <div class="field">
+      <label for="loginEmail">Email</label>
+      <input type="email" id="loginEmail" autocomplete="username">
+    </div>
+    <div class="field">
+      <label for="loginPassword">Password</label>
+      <input type="password" id="loginPassword" autocomplete="current-password">
+    </div>
+    <button class="btn" id="loginBtn" style="width:100%;">Log In</button>
+    <div class="msg" id="loginMsg"></div>
+  </div>
+
+  <div id="dashboard">
+    <div class="panel">
+      <h2>Add Portfolio Item</h2>
+      <form id="itemForm">
+        <div class="field">
+          <label for="title">Title</label>
+          <input type="text" id="title" placeholder="e.g. Name / Word Canvas" required>
+        </div>
+        <div class="row-2">
+          <div class="field">
+            <label for="category">Category</label>
+            <select id="category">
+              <option value="canvas">Canvas</option>
+              <option value="tshirt">T-Shirt</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="code">Product Code</label>
+            <input type="text" id="code" placeholder="e.g. AZ001" required>
+          </div>
+        </div>
+        <div class="field">
+          <label for="price">Price (Rs.) — optional</label>
+          <input type="text" id="price" placeholder="Leave blank if price varies (e.g. handmade canvas work)">
+        </div>
+        <div class="field">
+          <label for="description">Short Description</label>
+          <textarea id="description" rows="2" placeholder="One line about this piece"></textarea>
+        </div>
+        <div class="field">
+          <label for="imageFile">Photo</label>
+          <input type="file" id="imageFile" accept="image/*" required>
+          <div class="upload-status" id="uploadStatus"></div>
+        </div>
+        <div class="checkbox-field">
+          <input type="checkbox" id="featured">
+          <label for="featured">Show on homepage "Favourites" (pick your best — up to 6 recommended)</label>
+        </div>
+        <button type="submit" class="btn" id="saveBtn">Add to Portfolio</button>
+        <div class="msg" id="itemMsg"></div>
+      </form>
+    </div>
+
+    <div class="panel">
+      <h2>Current Portfolio Items</h2>
+      <p class="field-hint" style="margin-bottom:14px;">Use "★ Feature" / "☆ Unfeature" to control what shows on the homepage.</p>
+      <div class="items-list" id="itemsList">
+        <div class="empty">Loading…</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyCbFacWRr86mHMgc5bevqh2NKcHzz2edRw",
+    authDomain: "art-by-zahra.firebaseapp.com",
+    projectId: "art-by-zahra",
+    storageBucket: "art-by-zahra.firebasestorage.app",
+    messagingSenderId: "485324220852",
+    appId: "1:485324220852:web:a7ba565e44ed5640e16ae1"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  const CLOUDINARY_CLOUD_NAME = "aogwjjk1";
+  const CLOUDINARY_UPLOAD_PRESET = "tcljmmpo";
+
+  const loginBox = document.getElementById('loginBox');
+  const dashboard = document.getElementById('dashboard');
+  const logoutBtn = document.getElementById('logoutBtn');
+  const loginMsg = document.getElementById('loginMsg');
+
+  function showMsg(el, text, isError){
+    el.textContent = text;
+    el.classList.remove('error','success');
+    el.classList.add('show', isError ? 'error' : 'success');
+  }
+
+  auth.onAuthStateChanged(user=>{
+    if(user){
+      loginBox.style.display = 'none';
+      dashboard.style.display = 'block';
+      logoutBtn.style.display = 'inline-block';
+      loadItems();
+    } else {
+      loginBox.style.display = 'block';
+      dashboard.style.display = 'none';
+      logoutBtn.style.display = 'none';
+    }
+  });
+
+  document.getElementById('loginBtn').addEventListener('click', ()=>{
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    if(!email || !password){
+      showMsg(loginMsg, 'Please enter email and password.', true);
+      return;
+    }
+    auth.signInWithEmailAndPassword(email, password)
+      .catch(err=>{
+        showMsg(loginMsg, 'Login failed: ' + err.message, true);
+      });
+  });
+
+  logoutBtn.addEventListener('click', ()=> auth.signOut());
+
+  const itemForm = document.getElementById('itemForm');
+  const saveBtn = document.getElementById('saveBtn');
+  const itemMsg = document.getElementById('itemMsg');
+  const uploadStatus = document.getElementById('uploadStatus');
+
+  itemForm.addEventListener('submit', function(e){
+    e.preventDefault();
+    itemMsg.classList.remove('show');
+
+    const title = document.getElementById('title').value.trim();
+    const category = document.getElementById('category').value;
+    const code = document.getElementById('code').value.trim();
+    const price = document.getElementById('price').value.trim();
+    const description = document.getElementById('description').value.trim();
+    const featured = document.getElementById('featured').checked;
+    const file = document.getElementById('imageFile').files[0];
+
+    if(!file){
+      showMsg(itemMsg, 'Please choose a photo.', true);
+      return;
+    }
+    if(!code){
+      showMsg(itemMsg, 'Please enter a product code.', true);
+      return;
+    }
+
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Uploading…';
+    uploadStatus.textContent = 'Uploading photo to Cloudinary…';
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+
+    fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
+      method: 'POST',
+      body: formData
+    })
+    .then(res=>res.json())
+    .then(data=>{
+      if(!data.secure_url) throw new Error(data.error?.message || 'Upload failed');
+      uploadStatus.textContent = 'Photo uploaded. Saving item…';
+      return db.collection('portfolio').add({
+        title, category, code, price, description, featured,
+        imageUrl: data.secure_url,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    })
+    .then(()=>{
+      showMsg(itemMsg, 'Item added to portfolio!', false);
+      itemForm.reset();
+      uploadStatus.textContent = '';
+      loadItems();
+    })
+    .catch(err=>{
+      showMsg(itemMsg, 'Error: ' + err.message, true);
+      uploadStatus.textContent = '';
+    })
+    .finally(()=>{
+      saveBtn.disabled = false;
+      saveBtn.textContent = 'Add to Portfolio';
+    });
+  });
+
+  const itemsList = document.getElementById('itemsList');
+
+  function loadItems(){
+    itemsList.innerHTML = '<div class="empty">Loading…</div>';
+    db.collection('portfolio').orderBy('createdAt','desc').get().then(snapshot=>{
+      if(snapshot.empty){
+        itemsList.innerHTML = '<div class="empty">No items yet — add your first one above.</div>';
+        return;
+      }
+      itemsList.innerHTML = '';
+      snapshot.forEach(doc=>{
+        const item = doc.data();
+        const row = document.createElement('div');
+        row.className = 'item-row';
+        row.innerHTML = `
+          <img src="${item.imageUrl}" alt="">
+          <div class="item-info">
+            <h4>${item.title || 'Untitled'} ${item.featured ? '<span class="featured-star">★ Featured</span>' : ''}</h4>
+            <span>${item.category === 'tshirt' ? 'T-Shirt' : 'Canvas'}</span>
+            <span>Code: ${item.code || '—'}</span>
+            ${item.price ? `<span>Rs. ${item.price}</span>` : ''}
+          </div>
+          <div class="item-actions">
+            <button class="btn btn-star btn-small" data-action="feature" data-id="${doc.id}" data-featured="${!!item.featured}">${item.featured ? '☆ Unfeature' : '★ Feature'}</button>
+            <button class="btn btn-danger btn-small" data-action="delete" data-id="${doc.id}">Delete</button>
+          </div>
+        `;
+        row.querySelector('[data-action="feature"]').addEventListener('click', (e)=>{
+          const currentlyFeatured = e.target.dataset.featured === 'true';
+          db.collection('portfolio').doc(doc.id).update({featured: !currentlyFeatured}).then(loadItems);
+        });
+        row.querySelector('[data-action="delete"]').addEventListener('click', ()=>{
+          if(confirm('Delete this item?')){
+            db.collection('portfolio').doc(doc.id).delete().then(loadItems);
+          }
+        });
+        itemsList.appendChild(row);
+      });
+    }).catch(err=>{
+      itemsList.innerHTML = `<div class="empty">Could not load items: ${err.message}</div>`;
+    });
+  }
+</script>
+</body>
+</html>
